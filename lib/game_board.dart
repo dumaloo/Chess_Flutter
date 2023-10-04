@@ -29,6 +29,10 @@ class _GameBoardState extends State<GameBoard> {
   //Default value -1 indicated no piece is currently selected
   int selectedCol = -1;
 
+  //Identify List of Valid Moves for currently selected piece
+  //each move is represented as a list with 2 elements: row and col
+  List<List<int>> validMoves = [];
+
   @override
   void initState() {
     super.initState();
@@ -158,7 +162,43 @@ class _GameBoardState extends State<GameBoard> {
         selectedRow = row;
         selectedCol = col;
       }
+      //if a piece is selected calculate its valid moves
+      validMoves =
+          calculateRawValidMoves(selectedRow, selectedCol, selectedPiece);
     });
+  }
+
+  //CALCULATE RAW VALID MOVES
+  List<List<int>> calculateRawValidMoves(int row, int col, ChessPiece? piece) {
+    List<List<int>> candidateMoves = [];
+
+    //different directions based on their color
+    int direction = piece!.isWhite ? -1 : 1;
+
+    switch (piece.type) {
+      case ChessPieceType.pawn:
+        //pawns can move forward if the square is not occupied
+        if (isInBoard(row + direction, col) &&
+            board[row + direction][col] == null) {
+          candidateMoves.add([row + direction, col]);
+        }
+
+        //pawns can move 2 squares forward if they are at their initial positions
+
+        //pawns can capture diagonally
+        break;
+      case ChessPieceType.rook:
+        break;
+      case ChessPieceType.knight:
+        break;
+      case ChessPieceType.bishop:
+        break;
+      case ChessPieceType.king:
+        break;
+      case ChessPieceType.queen:
+        break;
+      default:
+    }
   }
 
   @override
