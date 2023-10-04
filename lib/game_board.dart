@@ -12,6 +12,24 @@ class GameBoard extends StatefulWidget {
 }
 
 class _GameBoardState extends State<GameBoard> {
+  // A 2-D list representing the chessboard,
+  //with each position possibly containing a chess piece
+
+  late List<List<ChessPiece?>> board;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeBoard();
+  }
+
+  //INITIALIZE BOARD
+
+  void _initializeBoard() {
+    //initialize the board with nulls, meaning no pieces in those positions
+    List<List<ChessPiece?>> newBoard = List.generate
+  }
+
   //Create a chess piece
   ChessPiece mypawn = ChessPiece(
     type: ChessPieceType.pawn,
@@ -25,7 +43,7 @@ class _GameBoardState extends State<GameBoard> {
       backgroundColor: backgroundColor,
       body: GridView.builder(
         itemCount: 8 * 8,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         gridDelegate:
             const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 8),
         itemBuilder: (context, index) {
