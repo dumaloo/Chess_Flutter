@@ -184,6 +184,13 @@ class _GameBoardState extends State<GameBoard> {
         }
 
         //pawns can move 2 squares forward if they are at their initial positions
+        if ((row == 1 && !piece.isWhite) || (row == 6 && piece.isWhite)) {
+          if (isInBoard(row + 2, col) &&
+              board[row + 2 * direction][col] == null &&
+              board[row + direction][col] == null) {
+            candidateMoves.add([row + 2 * direction, col]);
+          }
+        }
 
         //pawns can capture diagonally
         break;
