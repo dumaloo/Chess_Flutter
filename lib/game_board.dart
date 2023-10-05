@@ -273,7 +273,7 @@ class _GameBoardState extends State<GameBoard> {
         ];
 
         for (var direction in directions) {
-          var i = 0;
+          var i = 1;
           while (true) {
             var newRow = row + i * direction[0];
             var newCol = col + i * direction[1];
@@ -344,9 +344,10 @@ class _GameBoardState extends State<GameBoard> {
               if (board[newRow][newCol]!.isWhite != piece.isWhite) {
                 candidateMoves.add([newRow, newCol]); //capture
               }
-              break; //blocked
+              break; //block
             }
             candidateMoves.add([newRow, newCol]);
+            i++;
           }
         }
         break;
@@ -354,6 +355,9 @@ class _GameBoardState extends State<GameBoard> {
     }
     return candidateMoves;
   }
+
+  //MOVE PIECE
+  void movePiece() {}
 
   @override
   Widget build(BuildContext context) {
