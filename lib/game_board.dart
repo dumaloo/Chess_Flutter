@@ -185,7 +185,7 @@ class _GameBoardState extends State<GameBoard> {
 
         //pawns can move 2 squares forward if they are at their initial positions
         if ((row == 1 && !piece.isWhite) || (row == 6 && piece.isWhite)) {
-          if (isInBoard(row + 2, col) &&
+          if (isInBoard(row + 2 * direction, col) &&
               board[row + 2 * direction][col] == null &&
               board[row + direction][col] == null) {
             candidateMoves.add([row + 2 * direction, col]);
@@ -193,6 +193,19 @@ class _GameBoardState extends State<GameBoard> {
         }
 
         //pawns can capture diagonally
+        //left diagonal
+        if (isInBoard(row + direction, col - 1) &&
+            board[row + direction][col - 1] != null &&
+            board[row + direction][col - 1]!.isWhite) {
+          candidateMoves.add([row + direction, col - 1]);
+        }
+        //right diagonal
+        if (isInBoard(row + direction, col + 1) &&
+            board[row + direction][col + 1] != null &&
+            board[row + direction][col + 1]!.isWhite) {
+          candidateMoves.add([row + direction, col + 1]);
+        }
+
         break;
       case ChessPieceType.rook:
         break;
@@ -206,6 +219,7 @@ class _GameBoardState extends State<GameBoard> {
         break;
       default:
     }
+    return candidateMoves;
   }
 
   @override
@@ -225,11 +239,21 @@ class _GameBoardState extends State<GameBoard> {
           //check if this square is selected or not
           bool isSelected = selectedRow == row && selectedCol == col;
 
+          //check if this square is a valid move
+          bool isValidMove = false;
+          for (var position in validMoves) {
+            //compare row and col
+            if (position[0] == row && position[1] == col) {
+              isValidMove = true;
+            }
+          }
+
           return Square(
             isWhite: isWhite(index),
             piece: board[row][col],
             isSelected: isSelected,
             onTap: () => pieceSelected(row, col),
+            isValidMove: isValidMove,
           );
         },
       ),
