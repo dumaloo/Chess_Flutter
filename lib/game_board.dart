@@ -205,9 +205,34 @@ class _GameBoardState extends State<GameBoard> {
             board[row + direction][col + 1]!.isWhite) {
           candidateMoves.add([row + direction, col + 1]);
         }
-
         break;
       case ChessPieceType.rook:
+        //horizontal and vertical directions
+        var directions = [
+          [-1, 0], //up
+          [1, 0], // down
+          [0, -1], //left
+          [0, 1], //right
+        ];
+
+        for (var direction in directions) {
+          var i = 1;
+          while (true) {
+            var newRow = row + i * direction[0];
+            var newCol = col + i * direction[1];
+            if (!isInBoard(newRow, newCol)) {
+              break;
+            }
+            if (board[newRow][newCol] != null) {
+              if (board[newRow][newCol]!.isWhite != piece.isWhite) {
+                candidateMoves.add([newRow, newCol]); //Kill it
+              }
+              break; //blocked
+            }
+            candidateMoves.add([newRow, newCol]);
+            i++;
+          }
+        }
         break;
       case ChessPieceType.knight:
         break;
