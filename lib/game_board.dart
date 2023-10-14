@@ -33,6 +33,12 @@ class _GameBoardState extends State<GameBoard> {
   //each move is represented as a list with 2 elements: row and col
   List<List<int>> validMoves = [];
 
+  // A list of white pieces that have been taken by the black player
+  List<ChessPiece> whitePiecestaken = [];
+
+  // A list of black pieces that have been taken by the white player
+  List<ChessPiece> blackPiecestaken = [];
+
   @override
   void initState() {
     super.initState();
@@ -156,12 +162,27 @@ class _GameBoardState extends State<GameBoard> {
   //USER SELECTED A PIECE
   void pieceSelected(int row, int col) {
     setState(() {
-      //selected a piece if there is a piece in that position
-      if (board[row][col] != null) {
+      // No piece has been selected yet, this is the first selection
+      if (selectedPiece == null && board[row][col] != null) {
         selectedPiece = board[row][col];
         selectedRow = row;
         selectedCol = col;
       }
+
+      // There is a piece already selected, but user can select another one of their pieces
+      else if (board[row][col] != null &&
+          board[row][col]!.isWhite == selectedPiece!.isWhite) {
+        selectedPiece = board[row][col];
+        selectedRow = row;
+        selectedCol = col;
+      }
+
+      //if there is a piece selected and user taps on a sqaure that is a valid move, move there
+      else if (selectedPiece != null &&
+          validMoves.any((element) => element[0] == row && element[1] == col)) {
+        movePiece(row, col);
+      }
+
       //if a piece is selected calculate its valid moves
       validMoves =
           calculateRawValidMoves(selectedRow, selectedCol, selectedPiece);
@@ -357,42 +378,77 @@ class _GameBoardState extends State<GameBoard> {
   }
 
   //MOVE PIECE
-  void movePiece() {}
+  void movePiece(int newRow, int newCol) {
+    // if the new spot has an enemy piece
+    if (board[newRow][newCol] != null) {
+      //add the captured piece to the appropriate list
+      var capturedPiece = board[newRow][newCol];
+      if (capturedPiece!.isWhite) {
+        whitePiecestaken.add(capturedPiece);
+      } else {
+        blackPiecestaken.add(capturedPiece);
+      }
+    }
+
+    //move the piece and clear the old spot
+    board[newRow][newCol] = selectedPiece;
+    board[selectedRow][selectedCol] = null;
+
+    //clear selection
+    setState(() {
+      selectedPiece = null;
+      selectedRow = -1;
+      selectedCol = -1;
+      validMoves = [];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
-      body: GridView.builder(
-        itemCount: 8 * 8,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 8),
-        itemBuilder: (context, index) {
-          // get the row and col position of this square
-          int row = index ~/ 8;
-          int col = index % 8;
+      body: Column(
+        children: [
+          //WHITE PIECES TAKEN
+          // Expanded(child: child),
 
-          //check if this square is selected or not
-          bool isSelected = selectedRow == row && selectedCol == col;
+          Expanded(
+            child: GridView.builder(
+              itemCount: 8 * 8,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 8),
+              itemBuilder: (context, index) {
+                // get the row and col position of this square
+                int row = index ~/ 8;
+                int col = index % 8;
 
-          //check if this square is a valid move
-          bool isValidMove = false;
-          for (var position in validMoves) {
-            //compare row and col
-            if (position[0] == row && position[1] == col) {
-              isValidMove = true;
-            }
-          }
+                //check if this square is selected or not
+                bool isSelected = selectedRow == row && selectedCol == col;
 
-          return Square(
-            isWhite: isWhite(index),
-            piece: board[row][col],
-            isSelected: isSelected,
-            onTap: () => pieceSelected(row, col),
-            isValidMove: isValidMove,
-          );
-        },
+                //check if this square is a valid move
+                bool isValidMove = false;
+                for (var position in validMoves) {
+                  //compare row and col
+                  if (position[0] == row && position[1] == col) {
+                    isValidMove = true;
+                  }
+                }
+
+                return Square(
+                  isWhite: isWhite(index),
+                  piece: board[row][col],
+                  isSelected: isSelected,
+                  onTap: () => pieceSelected(row, col),
+                  isValidMove: isValidMove,
+                );
+              },
+            ),
+          ),
+
+          //BLACK PIECES TAKEN
+          // Expanded(child: child),
+        ],
       ),
     );
   }
